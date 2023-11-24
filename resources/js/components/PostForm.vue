@@ -1,25 +1,31 @@
 <template>
     <form @submit.prevent="submitReply" class="mt-4">
-        <div v-if="author">
-            <label for="reply_content">Your Reply: {{ author }}</label>
+        <div v-if="parent_author">
+            <label for="reply_content">You Reply to: {{ parent_author }}</label>
         </div>
-        <label for="author">Your Username:</label>
-        <input
-            v-model="reply.author"
-            type="text"
-            name="author"
-            id="username"
-            class="w-full px-3 py-2 border rounded mb-2"
-        />
-        <label for="author_email">Your Email:</label>
-        <input
-            v-model="reply.email"
-            type="email"
-            name="email"
-            id="email"
-            class="w-full px-3 py-2 border rounded mb-2"
-            required
-        />
+        <div class="flex space-x-4 mt-4">
+            <div>
+                <label for="author">Your Username:</label>
+                <input
+                    v-model="user.name"
+                    type="text"
+                    name="author"
+                    id="username"
+                    class="w-full px-3 py-2 border rounded mb-2"
+                />
+            </div>
+            <div>
+                <label for="author_email">Your Email:</label>
+                <input
+                    v-model="user.email"
+                    type="email"
+                    name="email"
+                    id="email"
+                    class="w-full px-3 py-2 border rounded mb-2"
+                    required
+                />
+            </div>
+        </div>
         <label for="content">Your Post:</label>
         <textarea
             v-model="reply.content"
@@ -34,23 +40,18 @@
             :value="parent_post_id"
             name="parent_post_id"
         />
-        <button
-            type="submit"
-            class="mt-2 bg-blue-500 text-white py-2 px-4 rounded"
-        >
-            Submit Reply
-        </button>
+        <Button type="submit" title="Submit Reply" color="cyan" />
     </form>
 </template>
 
 <script>
+import Button from "../ui/Button.vue";
 export default {
-    props: ["parent_post_id", "author"],
+    components: { Button },
+    props: ["parent_post_id", "parent_author", "user", "onClick"],
     data() {
         return {
             reply: {
-                author: "",
-                email: "",
                 content: "",
             },
         };
@@ -59,19 +60,14 @@ export default {
         submitReply() {
             axios
                 .post("/posts", {
-                    author: this.reply.author,
-                    author_email: this.reply.email,
+                    author: this.user.name,
+                    author_email: this.user.email,
                     content: this.reply.content,
                     parent_post_id: this.parent_post_id,
                 })
                 .then((response) => {
-                    this.reply = {
-                        author: "",
-                        email: "",
-                        content: "",
-                    };
-                    this.showForm = false;
-                    this.$forceUpdate();
+                    this.reply.content = "";
+                    if (this.onClick) this.onClick();
                 })
                 .catch((error) => {
                     console.error("Error creating post:", error);

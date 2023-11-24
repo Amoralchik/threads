@@ -1,29 +1,40 @@
 <template>
     <div class="max-w-5xl mx-auto">
         <div class="mt-2">
-            <div
-                class="p-6 bg-white dark:bg-gray-800 overflow-hidden shadow sm:rounded-lg"
-            >
-                <PostForm />
+            <div class="p-6 bg-white overflow-hidden shadow sm:rounded-lg">
+                <PostForm :user="user" />
             </div>
         </div>
         <PostComponent
-            v-for="post in postsList"
+            v-for="post in displayedPosts"
             :key="post.id"
             :post="post"
             :author="post.author"
+            :user="user"
         />
+        <div class="flex space-x-4 items-center mt-4">
+            <Button
+                :onClick="goToPreviousPage"
+                title="Previous"
+                color="cyan"
+                :disabled="currentPage === 1"
+            />
+            <span>Page {{ currentPage }}</span>
+            <Button :onClick="goToNextPage" title="Next" color="cyan" />
+        </div>
     </div>
 </template>
 
 <script>
 import PostComponent from "./Post.vue";
 import PostForm from "./PostForm.vue";
+import Button from "../ui/Button.vue";
 
 export default {
     components: {
         PostComponent,
         PostForm,
+        Button,
     },
     props: {
         posts: {
@@ -31,9 +42,30 @@ export default {
             required: true,
         },
     },
+    computed: {
+        displayedPosts() {
+            const startIndex = (this.currentPage - 1) * this.postsPerPage;
+            const endIndex = startIndex + this.postsPerPage;
+            return this.postsList.slice(startIndex, endIndex);
+        },
+    },
     methods: {
+        goToPreviousPage() {
+            if (this.currentPage > 1) {
+                this.currentPage--;
+            }
+        },
+        goToNextPage() {
+            const lastPage = Math.ceil(
+                this.postsList.length / this.postsPerPage
+            );
+            if (this.currentPage < lastPage) {
+                this.currentPage++;
+            }
+        },
         processPost(posts, newPost) {
             const addToParent = (parent, post) => {
+                parent.descendants = parent.descendants || [];
                 if (parent.id === post.parent_post_id) {
                     parent.descendants.unshift(post);
                     return true;
@@ -66,6 +98,12 @@ export default {
     data() {
         return {
             postsList: this.posts,
+            currentPage: 1,
+            postsPerPage: 5,
+            user: {
+                name: "",
+                email: "",
+            },
         };
     },
 };

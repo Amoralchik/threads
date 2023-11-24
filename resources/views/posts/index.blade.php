@@ -20,7 +20,7 @@
         </style>
     </head>
     <body class="antialiased">
-        <div class="p-8 min-h-screen bg-gray-100 dark:bg-gray-900">
+        <div class="p-8 min-h-screen bg-gray-100">
             <div class="container mx-auto">
                 <div class="max-w-5xl mx-auto">
                     <div class="p-4">
@@ -36,7 +36,7 @@
                     <post-list :posts="{{$posts}}" />
                 </div>
 
-                <div class="flex justify-center mt-4 sm:items-center sm:justify-between">
+                <div class="max-w-5xl mx-auto mt-4">
                     <div class="ml-4 text-center text-sm text-gray-500 sm:text-right sm:ml-0">
                         Laravel v{{ Illuminate\Foundation\Application::VERSION }} (PHP v{{ PHP_VERSION }})
                     </div>

@@ -17,6 +17,6 @@
         </style>
     </head>
     <body>
-        <div id='app'></div>
+        <a href="/posts"> posts </a>
     </body>
 </html>
