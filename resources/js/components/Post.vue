@@ -22,15 +22,13 @@
                     </div>
                     <h2>{{ createdAt }}</h2>
                 </div>
-                <div class="mt-4">
-                    <h1>{{ post.content }}</h1>
-                </div>
+                <div v-html="content" class="mt-4 text-black"></div>
             </div>
         </div>
         <div class="mb-4 px-4 pt-2">
             <div class="flex justify-between items-baseline">
-                <Button :onClick="toggleForm" title="Reply" color="cyan" />
-                <Button :onClick="deletePost" title="Delete" color="red" />
+                <Button :onClick="toggleForm" label="Reply" />
+                <Button :onClick="deletePost" label="Delete" />
             </div>
             <PostForm
                 v-show="showForm"
@@ -53,12 +51,16 @@
 </template>
 
 <script>
+import Button from "primevue/button";
+import Card from "primevue/card";
+
 import dayjs from "dayjs";
 import gravatar from "gravatar";
-
 import dayjsTwitter from "dayjs-twitter";
+import { marked } from "marked";
+import DOMPurify from "dompurify";
+
 import PostForm from "./PostForm.vue";
-import Button from "../ui/Button.vue";
 
 dayjs.extend(dayjsTwitter);
 
@@ -66,6 +68,7 @@ export default {
     components: {
         PostForm,
         Button,
+        Card,
     },
     name: "post-component",
     props: ["post", "author", "user"],
@@ -78,6 +81,9 @@ export default {
                 { s: "100", r: "x", d: "retro" },
                 true
             ),
+            content: DOMPurify.sanitize(marked(this.post.content), {
+                SAFE_FOR_TEMPLATES: true,
+            }),
         };
     },
     methods: {

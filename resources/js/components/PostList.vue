@@ -12,29 +12,29 @@
             :author="post.author"
             :user="user"
         />
-        <div class="flex space-x-4 items-center mt-4">
-            <Button
-                :onClick="goToPreviousPage"
-                title="Previous"
-                color="cyan"
-                :disabled="currentPage === 1"
-            />
-            <span>Page {{ currentPage }}</span>
-            <Button :onClick="goToNextPage" title="Next" color="cyan" />
-        </div>
+        <Paginator
+            class="mt-4"
+            v-model:first="first"
+            v-model:rows="rows"
+            :rows="10"
+            :totalRecords="postsList.length"
+            :rowsPerPageOptions="[10, 20, 30]"
+        ></Paginator>
     </div>
 </template>
 
 <script>
+import Paginator from "primevue/paginator";
+import Button from "primevue/button";
 import PostComponent from "./Post.vue";
 import PostForm from "./PostForm.vue";
-import Button from "../ui/Button.vue";
 
 export default {
     components: {
         PostComponent,
         PostForm,
         Button,
+        Paginator,
     },
     props: {
         posts: {
@@ -44,9 +44,8 @@ export default {
     },
     computed: {
         displayedPosts() {
-            const startIndex = (this.currentPage - 1) * this.postsPerPage;
-            const endIndex = startIndex + this.postsPerPage;
-            return this.postsList.slice(startIndex, endIndex);
+            const count = this.first + this.rows;
+            return this.postsList.slice(this.first, count);
         },
     },
     methods: {
@@ -56,10 +55,7 @@ export default {
             }
         },
         goToNextPage() {
-            const lastPage = Math.ceil(
-                this.postsList.length / this.postsPerPage
-            );
-            if (this.currentPage < lastPage) {
+            if (this.currentPage < this.lastPage) {
                 this.currentPage++;
             }
         },
@@ -99,7 +95,10 @@ export default {
         return {
             postsList: this.posts,
             currentPage: 1,
-            postsPerPage: 5,
+            first: 0,
+            rows: 10,
+            postsPerPage: 10,
+            lastPage: Math.ceil(this.posts.length / 10),
             user: {
                 name: "",
                 email: "",
